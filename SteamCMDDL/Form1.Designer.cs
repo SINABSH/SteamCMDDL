@@ -28,162 +28,297 @@
         /// </summary>
         private void InitializeComponent()
         {
-            lblAppId = new Label();
-            txtAppId = new TextBox();
-            lblWorkshopItem = new Label();
-            rtbWorkshopIds = new RichTextBox();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             btnDownload = new Button();
             progressBar = new ProgressBar();
             txtLog = new TextBox();
-            btnClearAll = new Button();
             btnSaveList = new Button();
             btnLoadList = new Button();
             btnOpenFolder = new Button();
+            btnRetryFailed = new Button();
+            txtAddItem = new TextBox();
+            label1 = new Label();
+            btnAddItem = new Button();
+            txtAppId = new TextBox();
+            lblAppId = new Label();
+            lvWorkshopItems = new ListView();
+            columnHeader1 = new ColumnHeader();
+            columnHeader2 = new ColumnHeader();
+            btnRemoveSelected = new Button();
+            btnClearAll = new Button();
             SuspendLayout();
-            // 
-            // lblAppId
-            // 
-            lblAppId.AutoSize = true;
-            lblAppId.Font = new Font("Stencil", 14F, FontStyle.Bold);
-            lblAppId.Location = new Point(172, 77);
-            lblAppId.Name = "lblAppId";
-            lblAppId.Size = new Size(221, 33);
-            lblAppId.TabIndex = 0;
-            lblAppId.Text = "Steam App ID:";
-            // 
-            // txtAppId
-            // 
-            txtAppId.Font = new Font("Stencil", 14F, FontStyle.Bold);
-            txtAppId.Location = new Point(187, 136);
-            txtAppId.Name = "txtAppId";
-            txtAppId.Size = new Size(177, 41);
-            txtAppId.TabIndex = 1;
-            // 
-            // lblWorkshopItem
-            // 
-            lblWorkshopItem.AutoSize = true;
-            lblWorkshopItem.Font = new Font("Stencil", 14F, FontStyle.Bold);
-            lblWorkshopItem.Location = new Point(566, 28);
-            lblWorkshopItem.Name = "lblWorkshopItem";
-            lblWorkshopItem.Size = new Size(647, 33);
-            lblWorkshopItem.TabIndex = 2;
-            lblWorkshopItem.Text = "Workshop Item Links/IDs (one per line):";
-            // 
-            // rtbWorkshopIds
-            // 
-            rtbWorkshopIds.Location = new Point(542, 79);
-            rtbWorkshopIds.Name = "rtbWorkshopIds";
-            rtbWorkshopIds.Size = new Size(695, 702);
-            rtbWorkshopIds.TabIndex = 3;
-            rtbWorkshopIds.Text = "";
             // 
             // btnDownload
             // 
-            btnDownload.Font = new Font("Stencil", 14F, FontStyle.Bold);
-            btnDownload.Location = new Point(171, 199);
+            btnDownload.BackColor = Color.FromArgb(102, 192, 244);
+            btnDownload.FlatAppearance.BorderColor = Color.FromArgb(102, 192, 244);
+            btnDownload.FlatStyle = FlatStyle.Flat;
+            btnDownload.Font = new Font("Microsoft Sans Serif", 10F);
+            btnDownload.ForeColor = Color.FromArgb(18, 26, 37);
+            btnDownload.Location = new Point(251, 475);
+            btnDownload.Margin = new Padding(4, 3, 4, 3);
             btnDownload.Name = "btnDownload";
-            btnDownload.Size = new Size(208, 53);
+            btnDownload.Size = new Size(194, 48);
             btnDownload.TabIndex = 4;
             btnDownload.Text = "Download";
-            btnDownload.UseVisualStyleBackColor = true;
+            btnDownload.UseVisualStyleBackColor = false;
             btnDownload.Click += btnDownload_Click;
             // 
             // progressBar
             // 
-            progressBar.Location = new Point(42, 258);
+            progressBar.ForeColor = Color.FromArgb(102, 192, 244);
+            progressBar.Location = new Point(60, 528);
+            progressBar.Margin = new Padding(4, 3, 4, 3);
             progressBar.Name = "progressBar";
-            progressBar.Size = new Size(484, 34);
+            progressBar.Size = new Size(1066, 43);
             progressBar.TabIndex = 5;
+            progressBar.UseWaitCursor = true;
+            progressBar.Click += progressBar_Click;
             // 
             // txtLog
             // 
-            txtLog.Location = new Point(42, 298);
+            txtLog.BackColor = Color.Black;
+            txtLog.ForeColor = Color.Green;
+            txtLog.Location = new Point(59, 577);
+            txtLog.Margin = new Padding(4, 3, 4, 3);
             txtLog.Multiline = true;
             txtLog.Name = "txtLog";
             txtLog.ReadOnly = true;
-            txtLog.ScrollBars = ScrollBars.Vertical;
-            txtLog.Size = new Size(484, 483);
+            txtLog.Size = new Size(1066, 285);
             txtLog.TabIndex = 6;
-            // 
-            // btnClearAll
-            // 
-            btnClearAll.Font = new Font("Stencil", 14F, FontStyle.Bold);
-            btnClearAll.Location = new Point(76, 819);
-            btnClearAll.Name = "btnClearAll";
-            btnClearAll.Size = new Size(128, 41);
-            btnClearAll.TabIndex = 7;
-            btnClearAll.Text = "Clear All";
-            btnClearAll.UseVisualStyleBackColor = true;
-            btnClearAll.Click += btnClearAll_Click;
             // 
             // btnSaveList
             // 
-            btnSaveList.Font = new Font("Stencil", 14F, FontStyle.Bold);
-            btnSaveList.Location = new Point(752, 819);
+            btnSaveList.BackColor = Color.FromArgb(42, 71, 94);
+            btnSaveList.FlatAppearance.BorderColor = Color.FromArgb(102, 192, 244);
+            btnSaveList.FlatStyle = FlatStyle.Flat;
+            btnSaveList.Font = new Font("Microsoft Sans Serif", 10F);
+            btnSaveList.Location = new Point(157, 420);
+            btnSaveList.Margin = new Padding(4, 3, 4, 3);
             btnSaveList.Name = "btnSaveList";
-            btnSaveList.Size = new Size(209, 41);
+            btnSaveList.Size = new Size(156, 48);
             btnSaveList.TabIndex = 8;
-            btnSaveList.Text = "Save List...";
-            btnSaveList.UseVisualStyleBackColor = true;
+            btnSaveList.Text = "Save List";
+            btnSaveList.UseVisualStyleBackColor = false;
             btnSaveList.Click += btnSaveList_Click;
             // 
             // btnLoadList
             // 
-            btnLoadList.Font = new Font("Stencil", 14F, FontStyle.Bold);
-            btnLoadList.Location = new Point(1004, 819);
+            btnLoadList.BackColor = Color.FromArgb(42, 71, 94);
+            btnLoadList.FlatAppearance.BorderColor = Color.FromArgb(102, 192, 244);
+            btnLoadList.FlatStyle = FlatStyle.Flat;
+            btnLoadList.Font = new Font("Microsoft Sans Serif", 10F);
+            btnLoadList.Location = new Point(820, 420);
+            btnLoadList.Margin = new Padding(4, 3, 4, 3);
             btnLoadList.Name = "btnLoadList";
-            btnLoadList.Size = new Size(209, 41);
+            btnLoadList.Size = new Size(141, 48);
             btnLoadList.TabIndex = 8;
-            btnLoadList.Text = "Load List...";
-            btnLoadList.UseVisualStyleBackColor = true;
+            btnLoadList.Text = "Load List";
+            btnLoadList.UseVisualStyleBackColor = false;
             btnLoadList.Click += btnLoadList_Click;
             // 
             // btnOpenFolder
             // 
-            btnOpenFolder.Font = new Font("Stencil", 14F, FontStyle.Bold);
-            btnOpenFolder.Location = new Point(250, 819);
+            btnOpenFolder.BackColor = Color.FromArgb(42, 71, 94);
+            btnOpenFolder.FlatAppearance.BorderColor = Color.FromArgb(102, 192, 244);
+            btnOpenFolder.FlatStyle = FlatStyle.Flat;
+            btnOpenFolder.Font = new Font("Microsoft Sans Serif", 10F);
+            btnOpenFolder.Location = new Point(376, 868);
+            btnOpenFolder.Margin = new Padding(4, 3, 4, 3);
             btnOpenFolder.Name = "btnOpenFolder";
-            btnOpenFolder.Size = new Size(441, 41);
+            btnOpenFolder.Size = new Size(378, 48);
             btnOpenFolder.TabIndex = 8;
             btnOpenFolder.Text = "Open Download Folder";
-            btnOpenFolder.UseVisualStyleBackColor = true;
+            btnOpenFolder.UseVisualStyleBackColor = false;
             btnOpenFolder.Click += btnOpenFolder_Click;
+            // 
+            // btnRetryFailed
+            // 
+            btnRetryFailed.BackColor = Color.FromArgb(42, 71, 94);
+            btnRetryFailed.FlatAppearance.BorderColor = Color.FromArgb(102, 192, 244);
+            btnRetryFailed.FlatStyle = FlatStyle.Flat;
+            btnRetryFailed.Font = new Font("Microsoft Sans Serif", 10F);
+            btnRetryFailed.Location = new Point(691, 475);
+            btnRetryFailed.Margin = new Padding(4, 3, 4, 3);
+            btnRetryFailed.Name = "btnRetryFailed";
+            btnRetryFailed.Size = new Size(213, 48);
+            btnRetryFailed.TabIndex = 13;
+            btnRetryFailed.Text = "Retry Failed";
+            btnRetryFailed.UseVisualStyleBackColor = false;
+            btnRetryFailed.Click += btnRetryFailed_Click;
+            // 
+            // txtAddItem
+            // 
+            txtAddItem.BackColor = Color.FromArgb(42, 71, 94);
+            txtAddItem.BorderStyle = BorderStyle.FixedSingle;
+            txtAddItem.Font = new Font("Microsoft Sans Serif", 10F);
+            txtAddItem.ForeColor = Color.FromArgb(199, 213, 224);
+            txtAddItem.Location = new Point(357, 88);
+            txtAddItem.Margin = new Padding(4, 3, 4, 3);
+            txtAddItem.Name = "txtAddItem";
+            txtAddItem.Size = new Size(604, 30);
+            txtAddItem.TabIndex = 10;
+            txtAddItem.TextChanged += txtAddItem_TextChanged;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Font = new Font("Microsoft Sans Serif", 10F);
+            label1.Location = new Point(59, 93);
+            label1.Margin = new Padding(4, 0, 4, 0);
+            label1.Name = "label1";
+            label1.Size = new Size(276, 25);
+            label1.TabIndex = 0;
+            label1.Text = "Workshop Collection/Links/ID:";
+            // 
+            // btnAddItem
+            // 
+            btnAddItem.BackColor = Color.FromArgb(42, 71, 94);
+            btnAddItem.FlatAppearance.BorderColor = Color.FromArgb(102, 192, 244);
+            btnAddItem.FlatStyle = FlatStyle.Flat;
+            btnAddItem.Font = new Font("Microsoft Sans Serif", 10F);
+            btnAddItem.Location = new Point(979, 45);
+            btnAddItem.Margin = new Padding(4, 3, 4, 3);
+            btnAddItem.Name = "btnAddItem";
+            btnAddItem.Size = new Size(146, 73);
+            btnAddItem.TabIndex = 11;
+            btnAddItem.Text = "Add";
+            btnAddItem.UseVisualStyleBackColor = false;
+            btnAddItem.Click += btnAddItem_Click;
+            // 
+            // txtAppId
+            // 
+            txtAppId.AccessibleDescription = "Steam App ID";
+            txtAppId.BackColor = Color.FromArgb(42, 71, 94);
+            txtAppId.BorderStyle = BorderStyle.FixedSingle;
+            txtAppId.Font = new Font("Microsoft Sans Serif", 10F);
+            txtAppId.ForeColor = Color.FromArgb(199, 213, 224);
+            txtAppId.Location = new Point(316, 43);
+            txtAppId.Margin = new Padding(4, 3, 4, 3);
+            txtAppId.Name = "txtAppId";
+            txtAppId.Size = new Size(212, 30);
+            txtAppId.TabIndex = 1;
+            txtAppId.TextChanged += txtAppId_TextChanged;
+            // 
+            // lblAppId
+            // 
+            lblAppId.AutoSize = true;
+            lblAppId.Font = new Font("Microsoft Sans Serif", 10F);
+            lblAppId.Location = new Point(60, 45);
+            lblAppId.Margin = new Padding(4, 0, 4, 0);
+            lblAppId.Name = "lblAppId";
+            lblAppId.Size = new Size(227, 25);
+            lblAppId.TabIndex = 0;
+            lblAppId.Text = "Steam App ID (optional):";
+            // 
+            // lvWorkshopItems
+            // 
+            lvWorkshopItems.BackColor = Color.LightSlateGray;
+            lvWorkshopItems.BorderStyle = BorderStyle.FixedSingle;
+            lvWorkshopItems.Columns.AddRange(new ColumnHeader[] { columnHeader1, columnHeader2 });
+            lvWorkshopItems.ForeColor = Color.FromArgb(199, 213, 224);
+            lvWorkshopItems.FullRowSelect = true;
+            lvWorkshopItems.GridLines = true;
+            lvWorkshopItems.Location = new Point(59, 124);
+            lvWorkshopItems.Margin = new Padding(4, 3, 4, 3);
+            lvWorkshopItems.Name = "lvWorkshopItems";
+            lvWorkshopItems.Size = new Size(1066, 290);
+            lvWorkshopItems.TabIndex = 9;
+            lvWorkshopItems.UseCompatibleStateImageBehavior = false;
+            lvWorkshopItems.View = View.Details;
+            // 
+            // columnHeader1
+            // 
+            columnHeader1.Text = "Workshop Item";
+            columnHeader1.Width = 910;
+            // 
+            // columnHeader2
+            // 
+            columnHeader2.Text = "Status";
+            columnHeader2.Width = 150;
+            // 
+            // btnRemoveSelected
+            // 
+            btnRemoveSelected.BackColor = Color.FromArgb(42, 71, 94);
+            btnRemoveSelected.FlatAppearance.BorderColor = Color.FromArgb(102, 192, 244);
+            btnRemoveSelected.FlatStyle = FlatStyle.Flat;
+            btnRemoveSelected.Font = new Font("Microsoft Sans Serif", 10F);
+            btnRemoveSelected.Location = new Point(376, 421);
+            btnRemoveSelected.Margin = new Padding(4, 3, 4, 3);
+            btnRemoveSelected.Name = "btnRemoveSelected";
+            btnRemoveSelected.Size = new Size(378, 48);
+            btnRemoveSelected.TabIndex = 12;
+            btnRemoveSelected.Text = "Remove selected";
+            btnRemoveSelected.UseVisualStyleBackColor = false;
+            btnRemoveSelected.Click += btnRemoveSelected_Click;
+            // 
+            // btnClearAll
+            // 
+            btnClearAll.BackColor = Color.FromArgb(42, 71, 94);
+            btnClearAll.FlatAppearance.BorderColor = Color.FromArgb(102, 192, 244);
+            btnClearAll.FlatStyle = FlatStyle.Flat;
+            btnClearAll.Font = new Font("Microsoft Sans Serif", 10F);
+            btnClearAll.Location = new Point(453, 475);
+            btnClearAll.Margin = new Padding(4, 3, 4, 3);
+            btnClearAll.Name = "btnClearAll";
+            btnClearAll.Size = new Size(230, 48);
+            btnClearAll.TabIndex = 7;
+            btnClearAll.Text = "Clear All";
+            btnClearAll.UseVisualStyleBackColor = false;
+            btnClearAll.Click += btnClearAll_Click;
             // 
             // Form1
             // 
-            AutoScaleDimensions = new SizeF(10F, 25F);
+            AutoScaleDimensions = new SizeF(12F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1271, 904);
+            BackColor = Color.FromArgb(64, 64, 64);
+            ClientSize = new Size(1183, 964);
             Controls.Add(btnOpenFolder);
-            Controls.Add(btnLoadList);
-            Controls.Add(btnSaveList);
-            Controls.Add(btnClearAll);
             Controls.Add(txtLog);
             Controls.Add(progressBar);
-            Controls.Add(btnDownload);
-            Controls.Add(rtbWorkshopIds);
-            Controls.Add(lblWorkshopItem);
-            Controls.Add(txtAppId);
+            Controls.Add(btnAddItem);
+            Controls.Add(btnClearAll);
+            Controls.Add(lvWorkshopItems);
             Controls.Add(lblAppId);
+            Controls.Add(btnLoadList);
+            Controls.Add(label1);
+            Controls.Add(txtAppId);
+            Controls.Add(btnSaveList);
+            Controls.Add(btnRetryFailed);
+            Controls.Add(txtAddItem);
+            Controls.Add(btnRemoveSelected);
+            Controls.Add(btnDownload);
+            Font = new Font("Microsoft Sans Serif", 10F);
+            ForeColor = Color.FromArgb(199, 213, 224);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
+            Icon = (Icon)resources.GetObject("$this.Icon");
+            Margin = new Padding(4, 3, 4, 3);
+            MaximizeBox = false;
             Name = "Form1";
-            Text = "Form1";
+            Text = "SteamCMDDL";
             Load += Form1_Load;
             ResumeLayout(false);
             PerformLayout();
         }
 
         #endregion
-
-        private Label lblAppId;
-        private TextBox txtAppId;
         private Label lblWorkshopItem;
-        private RichTextBox rtbWorkshopIds;
         private Button btnDownload;
         private ProgressBar progressBar;
         private TextBox txtLog;
-        private Button btnClearAll;
         private Button btnSaveList;
         private Button btnLoadList;
         private Button btnOpenFolder;
+        private Button btnRetryFailed;
+        private ListView lvWorkshopItems;
+        private ColumnHeader columnHeader1;
+        private ColumnHeader columnHeader2;
+        private TextBox txtAddItem;
+        private Label label1;
+        private Button btnAddItem;
+        private TextBox txtAppId;
+        private Label lblAppId;
+        private Button btnRemoveSelected;
+        private Button btnClearAll;
     }
 }
