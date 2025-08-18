@@ -1,4 +1,3 @@
-// These 'using' statements are necessary for the code to work
 using System.Diagnostics;
 using System.IO.Compression;
 using System.Text.RegularExpressions;
