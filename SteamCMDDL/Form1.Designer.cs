@@ -41,14 +41,18 @@
             btnAddItem = new Button();
             txtAppId = new TextBox();
             lblAppId = new Label();
+            btnRemoveSelected = new Button();
+            btnClearAll = new Button();
+            picModPreview = new PictureBox();
             lvWorkshopItems = new ListView();
             columnHeader1 = new ColumnHeader();
             columnHeader2 = new ColumnHeader();
             columnHeader3 = new ColumnHeader();
-            btnRemoveSelected = new Button();
-            btnClearAll = new Button();
-            pictureBox1 = new PictureBox();
-            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
+            lblModAuthor = new Label();
+            lblModSize = new Label();
+            lblModPosted = new Label();
+            lblModVisitors = new Label();
+            ((System.ComponentModel.ISupportInitialize)picModPreview).BeginInit();
             SuspendLayout();
             // 
             // btnDownload
@@ -75,7 +79,6 @@
             progressBar.Size = new Size(1066, 43);
             progressBar.TabIndex = 5;
             progressBar.UseWaitCursor = true;
-            progressBar.Click += progressBar_Click;
             // 
             // txtLog
             // 
@@ -160,7 +163,6 @@
             txtAddItem.Name = "txtAddItem";
             txtAddItem.Size = new Size(604, 30);
             txtAddItem.TabIndex = 10;
-            txtAddItem.TextChanged += txtAddItem_TextChanged;
             // 
             // label1
             // 
@@ -200,7 +202,6 @@
             txtAppId.Name = "txtAppId";
             txtAppId.Size = new Size(212, 30);
             txtAppId.TabIndex = 1;
-            txtAppId.TextChanged += txtAppId_TextChanged;
             // 
             // lblAppId
             // 
@@ -212,37 +213,6 @@
             lblAppId.Size = new Size(227, 25);
             lblAppId.TabIndex = 0;
             lblAppId.Text = "Steam App ID (optional):";
-            // 
-            // lvWorkshopItems
-            // 
-            lvWorkshopItems.BackColor = Color.DimGray;
-            lvWorkshopItems.BorderStyle = BorderStyle.FixedSingle;
-            lvWorkshopItems.Columns.AddRange(new ColumnHeader[] { columnHeader1, columnHeader2, columnHeader3 });
-            lvWorkshopItems.ForeColor = Color.FromArgb(199, 213, 224);
-            lvWorkshopItems.FullRowSelect = true;
-            lvWorkshopItems.GridLines = true;
-            lvWorkshopItems.Location = new Point(59, 124);
-            lvWorkshopItems.Margin = new Padding(4, 3, 4, 3);
-            lvWorkshopItems.Name = "lvWorkshopItems";
-            lvWorkshopItems.Size = new Size(1066, 290);
-            lvWorkshopItems.TabIndex = 9;
-            lvWorkshopItems.UseCompatibleStateImageBehavior = false;
-            lvWorkshopItems.View = View.Details;
-            // 
-            // columnHeader1
-            // 
-            columnHeader1.Text = "Name";
-            columnHeader1.Width = 500;
-            // 
-            // columnHeader2
-            // 
-            columnHeader2.Text = "Status";
-            columnHeader2.Width = 100;
-            // 
-            // columnHeader3
-            // 
-            columnHeader3.Text = "ID/Link";
-            columnHeader3.Width = 460;
             // 
             // btnRemoveSelected
             // 
@@ -274,27 +244,97 @@
             btnClearAll.UseVisualStyleBackColor = false;
             btnClearAll.Click += btnClearAll_Click;
             // 
-            // pictureBox1
+            // picModPreview
             // 
-            pictureBox1.Location = new Point(1132, 124);
-            pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(437, 290);
-            pictureBox1.TabIndex = 14;
-            pictureBox1.TabStop = false;
+            picModPreview.Location = new Point(1132, 124);
+            picModPreview.Name = "picModPreview";
+            picModPreview.Size = new Size(437, 290);
+            picModPreview.TabIndex = 14;
+            picModPreview.TabStop = false;
+            // 
+            // lvWorkshopItems
+            // 
+            lvWorkshopItems.BackColor = Color.FromArgb(64, 64, 64);
+            lvWorkshopItems.Columns.AddRange(new ColumnHeader[] { columnHeader1, columnHeader2, columnHeader3 });
+            lvWorkshopItems.ForeColor = Color.Silver;
+            lvWorkshopItems.FullRowSelect = true;
+            lvWorkshopItems.GridLines = true;
+            lvWorkshopItems.Location = new Point(59, 124);
+            lvWorkshopItems.Name = "lvWorkshopItems";
+            lvWorkshopItems.Size = new Size(1066, 290);
+            lvWorkshopItems.TabIndex = 15;
+            lvWorkshopItems.UseCompatibleStateImageBehavior = false;
+            lvWorkshopItems.View = View.Details;
+            lvWorkshopItems.SelectedIndexChanged += lvWorkshopItems_SelectedIndexChanged;
+            // 
+            // columnHeader1
+            // 
+            columnHeader1.Text = "Name";
+            columnHeader1.Width = 481;
+            // 
+            // columnHeader2
+            // 
+            columnHeader2.Text = "Status";
+            columnHeader2.Width = 100;
+            // 
+            // columnHeader3
+            // 
+            columnHeader3.Text = "Link/ID";
+            columnHeader3.Width = 481;
+            // 
+            // lblModAuthor
+            // 
+            lblModAuthor.AutoSize = true;
+            lblModAuthor.Location = new Point(1304, 432);
+            lblModAuthor.Name = "lblModAuthor";
+            lblModAuthor.Size = new Size(115, 25);
+            lblModAuthor.TabIndex = 16;
+            lblModAuthor.Text = "Author: N/A";
+            // 
+            // lblModSize
+            // 
+            lblModSize.AutoSize = true;
+            lblModSize.Location = new Point(1304, 487);
+            lblModSize.Name = "lblModSize";
+            lblModSize.Size = new Size(96, 25);
+            lblModSize.TabIndex = 16;
+            lblModSize.Text = "Size: N/A";
+            // 
+            // lblModPosted
+            // 
+            lblModPosted.AutoSize = true;
+            lblModPosted.Location = new Point(1304, 546);
+            lblModPosted.Name = "lblModPosted";
+            lblModPosted.Size = new Size(118, 25);
+            lblModPosted.TabIndex = 16;
+            lblModPosted.Text = "Posted: N/A";
+            // 
+            // lblModVisitors
+            // 
+            lblModVisitors.AutoSize = true;
+            lblModVisitors.Location = new Point(1304, 608);
+            lblModVisitors.Name = "lblModVisitors";
+            lblModVisitors.Size = new Size(121, 25);
+            lblModVisitors.TabIndex = 16;
+            lblModVisitors.Text = "Visitors: N/A";
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(12F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            BackColor = Color.FromArgb(64, 64, 64);
+            BackColor = Color.FromArgb(69, 69, 69);
             ClientSize = new Size(1621, 964);
-            Controls.Add(pictureBox1);
+            Controls.Add(lblModVisitors);
+            Controls.Add(lblModPosted);
+            Controls.Add(lblModSize);
+            Controls.Add(lblModAuthor);
+            Controls.Add(lvWorkshopItems);
+            Controls.Add(picModPreview);
             Controls.Add(btnOpenFolder);
             Controls.Add(txtLog);
             Controls.Add(progressBar);
             Controls.Add(btnAddItem);
             Controls.Add(btnClearAll);
-            Controls.Add(lvWorkshopItems);
             Controls.Add(lblAppId);
             Controls.Add(btnLoadList);
             Controls.Add(label1);
@@ -305,7 +345,7 @@
             Controls.Add(btnRemoveSelected);
             Controls.Add(btnDownload);
             Font = new Font("Microsoft Sans Serif", 10F);
-            ForeColor = Color.FromArgb(216, 216, 216);
+            ForeColor = Color.FromArgb(188, 188, 188);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(4, 3, 4, 3);
@@ -313,7 +353,7 @@
             Name = "Form1";
             Text = "SteamCMDDL";
             Load += Form1_Load;
-            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
+            ((System.ComponentModel.ISupportInitialize)picModPreview).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -327,9 +367,6 @@
         private Button btnLoadList;
         private Button btnOpenFolder;
         private Button btnRetryFailed;
-        private ListView lvWorkshopItems;
-        private ColumnHeader columnHeader1;
-        private ColumnHeader columnHeader2;
         private TextBox txtAddItem;
         private Label label1;
         private Button btnAddItem;
@@ -337,7 +374,14 @@
         private Label lblAppId;
         private Button btnRemoveSelected;
         private Button btnClearAll;
+        private PictureBox picModPreview;
+        private ListView lvWorkshopItems;
+        private ColumnHeader columnHeader1;
+        private ColumnHeader columnHeader2;
         private ColumnHeader columnHeader3;
-        private PictureBox pictureBox1;
+        private Label lblModAuthor;
+        private Label lblModSize;
+        private Label lblModPosted;
+        private Label lblModVisitors;
     }
 }
