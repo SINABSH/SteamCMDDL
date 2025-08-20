@@ -30,24 +30,56 @@ namespace SteamCMDDL
         }
         #endregion
 
+        private async Task<string> FetchModNameFromUrlAsync(string url)
+        {
+            try
+            {
+                // Download the HTML of the workshop item's page
+                var html = await client.GetStringAsync(url);
+                var htmlDoc = new HtmlAgilityPack.HtmlDocument();
+                htmlDoc.LoadHtml(html);
+
+                // The mod title is usually in a div with the class "workshopItemTitle"
+                var node = htmlDoc.DocumentNode.SelectSingleNode("//div[@class='workshopItemTitle']");
+
+                if (node != null)
+                {
+                    // Return the clean text of the title
+                    return System.Net.WebUtility.HtmlDecode(node.InnerText.Trim());
+                }
+            }
+            catch (Exception ex)
+            {
+                // If something goes wrong, log it but don't crash
+                Log($"Failed to fetch name for {url}: {ex.Message}");
+            }
+
+            // Return a default value if the name couldn't be found
+            return "Unknown Mod Name";
+        }
+
         #region Button Click Event Handlers
         private async void btnDownload_Click(object sender, EventArgs e)
         {
             Log("EVENT: btnDownload_Click - 'Download All' button was clicked.");
 
-            // --- THIS IS THE NEW APP ID AUTO-FETCH LOGIC ---
+            // --- App ID Auto-Detection Logic ---
             if (string.IsNullOrWhiteSpace(txtAppId.Text))
             {
                 Log("App ID is empty. Attempting auto-detection...");
+                // Find the first item in the list that looks like a URL
                 var firstUrl = lvWorkshopItems.Items.Cast<ListViewItem>()
-                                                    .Select(item => item.SubItems[0].Text)
+                                                    // THIS IS THE CORRECTED LINE:
+                                                    .Select(item => item.SubItems[2].Text) // Look in the 3rd column
                                                     .FirstOrDefault(text => text.ToLower().StartsWith("http"));
 
                 if (firstUrl != null)
                 {
+                    // Call our new method to get the App ID
                     string detectedAppId = await FetchAppIdFromWorkshopUrlAsync(firstUrl);
                     if (detectedAppId != null)
                     {
+                        // If we found it, update the textbox!
                         txtAppId.Text = detectedAppId;
                     }
                     else
@@ -62,7 +94,9 @@ namespace SteamCMDDL
                     return;
                 }
             }
+            // --- END of logic ---
 
+            // The rest of the download process continues as before
             if (!int.TryParse(txtAppId.Text, out _)) { MessageBox.Show("Please enter a valid numeric App ID.", "Error"); return; }
 
             var workshopIds = ParseWorkshopIdsFromListView();
@@ -94,18 +128,11 @@ namespace SteamCMDDL
         private async void btnAddItem_Click(object sender, EventArgs e)
         {
             string newItemText = txtAddItem.Text.Trim();
-            if (string.IsNullOrEmpty(newItemText)) { return; }
+            if (string.IsNullOrEmpty(newItemText)) return;
 
-            if (newItemText.ToLower().StartsWith("http"))
-            {
-                await AddItemsFromCollectionUrlAsync(newItemText);
-            }
-            else
-            {
-                ListViewItem item = new ListViewItem(newItemText);
-                item.SubItems.Add("Pending");
-                lvWorkshopItems.Items.Add(item);
-            }
+            // Call our new, dedicated helper method
+            await AddSingleItemToListAsync(newItemText);
+
             txtAddItem.Clear();
         }
 
@@ -314,40 +341,76 @@ namespace SteamCMDDL
 
         private async Task AddItemsFromCollectionUrlAsync(string url)
         {
-            SetControlsEnabled(false);
+            Log($"Attempting to parse collection from URL: {url}");
+            SetControlsEnabled(false); // Disable controls while we work
+
             try
             {
                 var html = await client.GetStringAsync(url);
                 var htmlDoc = new HtmlAgilityPack.HtmlDocument();
                 htmlDoc.LoadHtml(html);
+
                 var itemNodes = htmlDoc.DocumentNode.SelectNodes("//div[contains(@class, 'collectionItemDetails')]");
+
                 if (itemNodes == null || itemNodes.Count == 0)
                 {
-                    var singleItem = new ListViewItem(url);
-                    singleItem.SubItems.Add("Pending");
-                    lvWorkshopItems.Items.Add(singleItem);
+                    Log("No collection items found. Treating as a single item link.");
+                    // This now correctly calls our new awaitable helper method
+                    await AddSingleItemToListAsync(url);
+                    return;
                 }
-                else
+
+                Log($"Found {itemNodes.Count} items in the collection. Adding placeholders...");
+
+                // This list will hold the items we need to update
+                var itemsToUpdate = new List<(ListViewItem item, string itemUrl)>();
+
+                foreach (var node in itemNodes)
                 {
-                    foreach (var node in itemNodes)
+                    var linkNode = node.SelectSingleNode(".//a");
+                    if (linkNode != null)
                     {
-                        var linkNode = node.SelectSingleNode(".//a");
-                        if (linkNode != null)
+                        string itemUrl = linkNode.GetAttributeValue("href", string.Empty);
+                        if (!string.IsNullOrEmpty(itemUrl))
                         {
-                            string itemUrl = linkNode.GetAttributeValue("href", string.Empty);
-                            var newItem = new ListViewItem(itemUrl);
+                            // Instantly add the item to the list with a placeholder
+                            ListViewItem newItem = new ListViewItem("Fetching name...");
                             newItem.SubItems.Add("Pending");
+                            newItem.SubItems.Add(itemUrl);
                             lvWorkshopItems.Items.Add(newItem);
+
+                            // Add the new item and its URL to a list for background processing
+                            itemsToUpdate.Add((newItem, itemUrl));
                         }
                     }
                 }
+
+                // Now, fetch all the names in the background concurrently
+                foreach (var tuple in itemsToUpdate)
+                {
+                    // We use a "fire-and-forget" task for each item.
+                    // This starts all the downloads at once.
+                    _ = Task.Run(async () =>
+                    {
+                        string modName = await FetchModNameFromUrlAsync(tuple.itemUrl);
+
+                        // We must use Invoke to safely update the UI from a background thread
+                        this.Invoke(new Action(() =>
+                        {
+                            tuple.item.Text = modName;
+                        }));
+                    });
+                }
+                Log($"Started fetching names for {itemsToUpdate.Count} items in the background.");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Could not process the URL.\nError: {ex.Message}");
+                Log($"FAILURE: Could not parse collection. Error: {ex.Message}");
+                MessageBox.Show($"Could not process the URL.\nError: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
+                // Re-enable controls
                 SetControlsEnabled(true);
             }
         }
@@ -374,6 +437,22 @@ namespace SteamCMDDL
             if (string.IsNullOrEmpty(message) || txtLog.IsDisposed) return;
             if (txtLog.InvokeRequired) { txtLog.Invoke(new Action(() => Log(message))); }
             else { txtLog.AppendText($"[{DateTime.Now:HH:mm:ss}] {message}{Environment.NewLine}"); }
+        }
+
+        private async Task AddSingleItemToListAsync(string itemUrlOrId)
+        {
+            // Add the item to the list with a placeholder
+            ListViewItem newItem = new ListViewItem("Fetching name..."); // Placeholder for Name
+            newItem.SubItems.Add("Pending");                             // Status
+            newItem.SubItems.Add(itemUrlOrId);                           // The actual ID/Link
+            lvWorkshopItems.Items.Add(newItem);
+
+            // Fetch the real name in the background.
+            string modName = await Task.Run(() => FetchModNameFromUrlAsync(itemUrlOrId));
+
+            // Update the placeholder text in the ListView.
+            newItem.Text = modName;
+            Log($"Added '{modName}' to the list.");
         }
 
         private void SetControlsEnabled(bool isEnabled)

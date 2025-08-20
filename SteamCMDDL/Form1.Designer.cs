@@ -44,17 +44,19 @@
             lvWorkshopItems = new ListView();
             columnHeader1 = new ColumnHeader();
             columnHeader2 = new ColumnHeader();
+            columnHeader3 = new ColumnHeader();
             btnRemoveSelected = new Button();
             btnClearAll = new Button();
+            pictureBox1 = new PictureBox();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
             // btnDownload
             // 
-            btnDownload.BackColor = Color.FromArgb(102, 192, 244);
-            btnDownload.FlatAppearance.BorderColor = Color.FromArgb(102, 192, 244);
+            btnDownload.BackColor = Color.DimGray;
             btnDownload.FlatStyle = FlatStyle.Flat;
             btnDownload.Font = new Font("Microsoft Sans Serif", 10F);
-            btnDownload.ForeColor = Color.FromArgb(18, 26, 37);
+            btnDownload.ForeColor = Color.White;
             btnDownload.Location = new Point(251, 475);
             btnDownload.Margin = new Padding(4, 3, 4, 3);
             btnDownload.Name = "btnDownload";
@@ -77,22 +79,22 @@
             // 
             // txtLog
             // 
-            txtLog.BackColor = Color.Black;
+            txtLog.BackColor = Color.FromArgb(24, 24, 24);
             txtLog.ForeColor = Color.Green;
             txtLog.Location = new Point(59, 577);
             txtLog.Margin = new Padding(4, 3, 4, 3);
             txtLog.Multiline = true;
             txtLog.Name = "txtLog";
             txtLog.ReadOnly = true;
-            txtLog.Size = new Size(1066, 285);
+            txtLog.Size = new Size(1067, 285);
             txtLog.TabIndex = 6;
             // 
             // btnSaveList
             // 
-            btnSaveList.BackColor = Color.FromArgb(42, 71, 94);
-            btnSaveList.FlatAppearance.BorderColor = Color.FromArgb(102, 192, 244);
+            btnSaveList.BackColor = Color.DimGray;
             btnSaveList.FlatStyle = FlatStyle.Flat;
             btnSaveList.Font = new Font("Microsoft Sans Serif", 10F);
+            btnSaveList.ForeColor = Color.FromArgb(216, 216, 216);
             btnSaveList.Location = new Point(157, 420);
             btnSaveList.Margin = new Padding(4, 3, 4, 3);
             btnSaveList.Name = "btnSaveList";
@@ -104,10 +106,10 @@
             // 
             // btnLoadList
             // 
-            btnLoadList.BackColor = Color.FromArgb(42, 71, 94);
-            btnLoadList.FlatAppearance.BorderColor = Color.FromArgb(102, 192, 244);
+            btnLoadList.BackColor = Color.DimGray;
             btnLoadList.FlatStyle = FlatStyle.Flat;
             btnLoadList.Font = new Font("Microsoft Sans Serif", 10F);
+            btnLoadList.ForeColor = Color.FromArgb(216, 216, 216);
             btnLoadList.Location = new Point(820, 420);
             btnLoadList.Margin = new Padding(4, 3, 4, 3);
             btnLoadList.Name = "btnLoadList";
@@ -119,10 +121,10 @@
             // 
             // btnOpenFolder
             // 
-            btnOpenFolder.BackColor = Color.FromArgb(42, 71, 94);
-            btnOpenFolder.FlatAppearance.BorderColor = Color.FromArgb(102, 192, 244);
+            btnOpenFolder.BackColor = Color.DimGray;
             btnOpenFolder.FlatStyle = FlatStyle.Flat;
             btnOpenFolder.Font = new Font("Microsoft Sans Serif", 10F);
+            btnOpenFolder.ForeColor = Color.FromArgb(216, 216, 216);
             btnOpenFolder.Location = new Point(376, 868);
             btnOpenFolder.Margin = new Padding(4, 3, 4, 3);
             btnOpenFolder.Name = "btnOpenFolder";
@@ -134,10 +136,10 @@
             // 
             // btnRetryFailed
             // 
-            btnRetryFailed.BackColor = Color.FromArgb(42, 71, 94);
-            btnRetryFailed.FlatAppearance.BorderColor = Color.FromArgb(102, 192, 244);
+            btnRetryFailed.BackColor = Color.DimGray;
             btnRetryFailed.FlatStyle = FlatStyle.Flat;
             btnRetryFailed.Font = new Font("Microsoft Sans Serif", 10F);
+            btnRetryFailed.ForeColor = Color.FromArgb(216, 216, 216);
             btnRetryFailed.Location = new Point(691, 475);
             btnRetryFailed.Margin = new Padding(4, 3, 4, 3);
             btnRetryFailed.Name = "btnRetryFailed";
@@ -149,7 +151,7 @@
             // 
             // txtAddItem
             // 
-            txtAddItem.BackColor = Color.FromArgb(42, 71, 94);
+            txtAddItem.BackColor = Color.DimGray;
             txtAddItem.BorderStyle = BorderStyle.FixedSingle;
             txtAddItem.Font = new Font("Microsoft Sans Serif", 10F);
             txtAddItem.ForeColor = Color.FromArgb(199, 213, 224);
@@ -173,10 +175,10 @@
             // 
             // btnAddItem
             // 
-            btnAddItem.BackColor = Color.FromArgb(42, 71, 94);
-            btnAddItem.FlatAppearance.BorderColor = Color.FromArgb(102, 192, 244);
+            btnAddItem.BackColor = Color.DimGray;
             btnAddItem.FlatStyle = FlatStyle.Flat;
             btnAddItem.Font = new Font("Microsoft Sans Serif", 10F);
+            btnAddItem.ForeColor = Color.FromArgb(216, 216, 216);
             btnAddItem.Location = new Point(979, 45);
             btnAddItem.Margin = new Padding(4, 3, 4, 3);
             btnAddItem.Name = "btnAddItem";
@@ -189,7 +191,7 @@
             // txtAppId
             // 
             txtAppId.AccessibleDescription = "Steam App ID";
-            txtAppId.BackColor = Color.FromArgb(42, 71, 94);
+            txtAppId.BackColor = Color.DimGray;
             txtAppId.BorderStyle = BorderStyle.FixedSingle;
             txtAppId.Font = new Font("Microsoft Sans Serif", 10F);
             txtAppId.ForeColor = Color.FromArgb(199, 213, 224);
@@ -213,9 +215,9 @@
             // 
             // lvWorkshopItems
             // 
-            lvWorkshopItems.BackColor = Color.LightSlateGray;
+            lvWorkshopItems.BackColor = Color.DimGray;
             lvWorkshopItems.BorderStyle = BorderStyle.FixedSingle;
-            lvWorkshopItems.Columns.AddRange(new ColumnHeader[] { columnHeader1, columnHeader2 });
+            lvWorkshopItems.Columns.AddRange(new ColumnHeader[] { columnHeader1, columnHeader2, columnHeader3 });
             lvWorkshopItems.ForeColor = Color.FromArgb(199, 213, 224);
             lvWorkshopItems.FullRowSelect = true;
             lvWorkshopItems.GridLines = true;
@@ -229,20 +231,25 @@
             // 
             // columnHeader1
             // 
-            columnHeader1.Text = "Workshop Item";
-            columnHeader1.Width = 910;
+            columnHeader1.Text = "Name";
+            columnHeader1.Width = 500;
             // 
             // columnHeader2
             // 
             columnHeader2.Text = "Status";
-            columnHeader2.Width = 150;
+            columnHeader2.Width = 100;
+            // 
+            // columnHeader3
+            // 
+            columnHeader3.Text = "ID/Link";
+            columnHeader3.Width = 460;
             // 
             // btnRemoveSelected
             // 
-            btnRemoveSelected.BackColor = Color.FromArgb(42, 71, 94);
-            btnRemoveSelected.FlatAppearance.BorderColor = Color.FromArgb(102, 192, 244);
+            btnRemoveSelected.BackColor = Color.DimGray;
             btnRemoveSelected.FlatStyle = FlatStyle.Flat;
             btnRemoveSelected.Font = new Font("Microsoft Sans Serif", 10F);
+            btnRemoveSelected.ForeColor = Color.FromArgb(216, 216, 216);
             btnRemoveSelected.Location = new Point(376, 421);
             btnRemoveSelected.Margin = new Padding(4, 3, 4, 3);
             btnRemoveSelected.Name = "btnRemoveSelected";
@@ -254,10 +261,10 @@
             // 
             // btnClearAll
             // 
-            btnClearAll.BackColor = Color.FromArgb(42, 71, 94);
-            btnClearAll.FlatAppearance.BorderColor = Color.FromArgb(102, 192, 244);
+            btnClearAll.BackColor = Color.DimGray;
             btnClearAll.FlatStyle = FlatStyle.Flat;
             btnClearAll.Font = new Font("Microsoft Sans Serif", 10F);
+            btnClearAll.ForeColor = Color.FromArgb(216, 216, 216);
             btnClearAll.Location = new Point(453, 475);
             btnClearAll.Margin = new Padding(4, 3, 4, 3);
             btnClearAll.Name = "btnClearAll";
@@ -267,12 +274,21 @@
             btnClearAll.UseVisualStyleBackColor = false;
             btnClearAll.Click += btnClearAll_Click;
             // 
+            // pictureBox1
+            // 
+            pictureBox1.Location = new Point(1132, 124);
+            pictureBox1.Name = "pictureBox1";
+            pictureBox1.Size = new Size(437, 290);
+            pictureBox1.TabIndex = 14;
+            pictureBox1.TabStop = false;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(12F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(64, 64, 64);
-            ClientSize = new Size(1183, 964);
+            ClientSize = new Size(1621, 964);
+            Controls.Add(pictureBox1);
             Controls.Add(btnOpenFolder);
             Controls.Add(txtLog);
             Controls.Add(progressBar);
@@ -289,7 +305,7 @@
             Controls.Add(btnRemoveSelected);
             Controls.Add(btnDownload);
             Font = new Font("Microsoft Sans Serif", 10F);
-            ForeColor = Color.FromArgb(199, 213, 224);
+            ForeColor = Color.FromArgb(216, 216, 216);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(4, 3, 4, 3);
@@ -297,6 +313,7 @@
             Name = "Form1";
             Text = "SteamCMDDL";
             Load += Form1_Load;
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -320,5 +337,7 @@
         private Label lblAppId;
         private Button btnRemoveSelected;
         private Button btnClearAll;
+        private ColumnHeader columnHeader3;
+        private PictureBox pictureBox1;
     }
 }
