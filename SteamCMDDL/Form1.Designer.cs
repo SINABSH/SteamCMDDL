@@ -246,11 +246,14 @@
             // 
             // picModPreview
             // 
+            picModPreview.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             picModPreview.Location = new Point(1132, 124);
             picModPreview.Name = "picModPreview";
             picModPreview.Size = new Size(437, 290);
+            picModPreview.SizeMode = PictureBoxSizeMode.CenterImage;
             picModPreview.TabIndex = 14;
             picModPreview.TabStop = false;
+            picModPreview.Click += picModPreview_Click;
             // 
             // lvWorkshopItems
             // 

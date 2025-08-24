@@ -27,7 +27,7 @@ namespace SteamCMDDL
         {
             InitializeComponent();
             // This line is required to allow the status colors to change.
-           
+
         }
 
         #region Form Events
@@ -356,6 +356,7 @@ namespace SteamCMDDL
         {
             var details = new ModDetails
             {
+                // Set default values
                 Author = "N/A",
                 FileSize = "N/A",
                 DatePosted = "N/A",
@@ -368,52 +369,64 @@ namespace SteamCMDDL
                 var htmlDoc = new HtmlAgilityPack.HtmlDocument();
                 htmlDoc.LoadHtml(html);
 
-                // Image
-                details.ImageUrl =
-                    htmlDoc.DocumentNode.SelectSingleNode("//img[@id='previewImageMain']")
-                            ?.GetAttributeValue("src", null)
-                    ?? htmlDoc.DocumentNode.SelectSingleNode("//img[contains(@class, 'workshopItemPreviewImage')]")
-                        ?.GetAttributeValue("src", null);
+                details.ImageUrl = htmlDoc.DocumentNode.SelectSingleNode("//img[@id='previewImageMain']")
+                                     ?.GetAttributeValue("src", "");
 
-                // Author (breadcrumbs fallback)
-                var breadcrumb = htmlDoc.DocumentNode.SelectSingleNode("//div[@class='breadcrumbs']//a[contains(@href, 'profiles') or contains(@href, 'id/')]");
-                if (breadcrumb != null)
-                    details.Author = breadcrumb.InnerText.Trim();
-
-                // File Size, Posted, Updated: parse rightDetailsBlock as label-value pairs
-                var rightBlock = htmlDoc.DocumentNode.SelectSingleNode("//div[contains(@class, 'rightDetailsBlock')]");
-                if (rightBlock != null)
+                var authorNode = htmlDoc.DocumentNode.SelectSingleNode("//div[@class='creatorsBlock']//div[@class='friendBlockContent']");
+                if (authorNode != null)
                 {
-                    var divs = rightBlock.SelectNodes("./div");
-                    if (divs != null)
-                    {
-                        for (int i = 0; i < divs.Count - 1; i++)
-                        {
-                            var label = divs[i].InnerText.Trim();
-                            var value = divs[i + 1].InnerText.Trim();
+                    details.Author = authorNode.InnerText.Trim().Split('\n')[0].Trim();
+                }
 
-                            if (label.Equals("File Size", StringComparison.OrdinalIgnoreCase))
-                                details.FileSize = value;
-                            else if (label.Equals("Posted", StringComparison.OrdinalIgnoreCase))
-                                details.DatePosted = value;
-                            else if (label.Equals("Unique Visitors", StringComparison.OrdinalIgnoreCase))
-                                details.Visitors = value;
+                // --- THIS IS THE CORRECTED PART ---
+                // This new, more specific selector finds the details block that CONTAINS the stats containers.
+                var detailsBlock = htmlDoc.DocumentNode.SelectSingleNode("//div[@class='rightDetailsBlock' and .//div[@class='detailsStatsContainerLeft']]");
+                if (detailsBlock != null)
+                {
+                    var labels = detailsBlock.SelectNodes(".//div[@class='detailsStatLeft']");
+                    var values = detailsBlock.SelectNodes(".//div[@class='detailsStatRight']");
+
+                    if (labels != null && values != null && labels.Count == values.Count)
+                    {
+                        for (int i = 0; i < labels.Count; i++)
+                        {
+                            string labelText = labels[i].InnerText.Trim().ToLower();
+                            string valueText = values[i].InnerText.Trim();
+
+                            if (labelText.Contains("file size"))
+                            {
+                                details.FileSize = valueText;
+                            }
+                            else if (labelText.Contains("posted"))
+                            {
+                                details.DatePosted = valueText;
+                            }
                         }
                     }
                 }
 
-                // Fallback: try to extract using regex if HTML parsing fails
-                if (details.FileSize == "N/A")
+                var statsTable = htmlDoc.DocumentNode.SelectSingleNode("//table[@class='stats_table']");
+                if (statsTable != null)
                 {
-                    var fileSizeMatch = Regex.Match(html, @"File Size<\/div>\s*<div[^>]*>([^<]+)<\/div>", RegexOptions.IgnoreCase);
-                    if (fileSizeMatch.Success)
-                        details.FileSize = fileSizeMatch.Groups[1].Value.Trim();
-                }
-                if (details.DatePosted == "N/A")
-                {
-                    var postedMatch = Regex.Match(html, @"Posted<\/div>\s*<div[^>]*>([^<]+)<\/div>", RegexOptions.IgnoreCase);
-                    if (postedMatch.Success)
-                        details.DatePosted = postedMatch.Groups[1].Value.Trim();
+                    var rows = statsTable.SelectNodes(".//tr");
+                    if (rows != null)
+                    {
+                        foreach (var row in rows)
+                        {
+                            var cells = row.SelectNodes("td");
+                            if (cells != null && cells.Count == 2)
+                            {
+                                string value = cells[0].InnerText.Trim();
+                                string label = cells[1].InnerText.Trim();
+
+                                if (label.ToLower().Contains("unique visitors"))
+                                {
+                                    details.Visitors = value;
+                                    break;
+                                }
+                            }
+                        }
+                    }
                 }
 
                 return details;
@@ -421,8 +434,13 @@ namespace SteamCMDDL
             catch (Exception ex)
             {
                 Log($"Failed to fetch mod details for {url}: {ex.Message}");
-                return null;
+                return null; // Return null if something goes wrong
             }
+        }
+
+        private void picModPreview_Click(object sender, EventArgs e)
+        {
+
         }
     }
     #endregion
