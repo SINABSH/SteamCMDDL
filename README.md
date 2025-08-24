@@ -2,7 +2,7 @@
 
 A simple and easy-to-use C# Windows Forms application for downloading Steam Workshop items for any game. This tool automates the use of SteamCMD, allowing users to download multiple items, including entire collections, with a convenient graphical interface.
 
-![App Screenshot](ScreenShot.png)
+![App Screenshot](image.png)
 
 
 ---
