@@ -73,6 +73,45 @@ namespace SteamCMDDL
                 }
             }
         }
+
+        private async Task<List<string>> GetItemUrlsFromCollectionAsync(string collectionUrl)
+        {
+            var itemUrls = new List<string>();
+            try
+            {
+                Log($"Expanding collection: {collectionUrl}");
+                var html = await client.GetStringAsync(collectionUrl);
+                var htmlDoc = new HtmlAgilityPack.HtmlDocument();
+                htmlDoc.LoadHtml(html);
+
+                // This selector finds all the divs that contain an item in the collection.
+                var itemNodes = htmlDoc.DocumentNode.SelectNodes("//div[@class='collectionItem']");
+
+                if (itemNodes != null)
+                {
+                    foreach (var node in itemNodes)
+                    {
+                        // Inside each item, we find the link to its page.
+                        var linkNode = node.SelectSingleNode(".//a");
+                        if (linkNode != null)
+                        {
+                            string itemUrl = linkNode.GetAttributeValue("href", string.Empty);
+                            if (!string.IsNullOrEmpty(itemUrl))
+                            {
+                                itemUrls.Add(itemUrl);
+                            }
+                        }
+                    }
+                }
+                Log($"Found {itemUrls.Count} items inside collection.");
+                return itemUrls;
+            }
+            catch (Exception ex)
+            {
+                Log($"Failed to expand collection {collectionUrl}: {ex.Message}");
+                return null; // Return null on failure
+            }
+        }
         #endregion
 
         #region Button Click Event Handlers
@@ -109,9 +148,13 @@ namespace SteamCMDDL
         private async void btnAddItem_Click(object sender, EventArgs e)
         {
             string newItemText = txtAddItem.Text.Trim();
-            if (string.IsNullOrEmpty(newItemText)) { return; }
-            await AddSingleItemToListAsync(newItemText);
+            if (string.IsNullOrEmpty(newItemText)) return;
+
+            // Call our new, unified helper method
+            await AddItemToListAsync(newItemText);
+
             txtAddItem.Clear();
+            txtAddItem.Focus();
         }
 
         private void btnRemoveSelected_Click(object sender, EventArgs e)
@@ -158,9 +201,10 @@ namespace SteamCMDDL
                     {
                         lvWorkshopItems.Items.Clear();
                         txtAppId.Text = allLines[0];
+                        // Call our new, unified helper for each URL
                         foreach (string workshopUrl in allLines.Skip(1))
                         {
-                            _ = AddSingleItemToListAsync(workshopUrl);
+                            _ = AddItemToListAsync(workshopUrl);
                         }
                     }
                 }
@@ -175,28 +219,88 @@ namespace SteamCMDDL
         #endregion
 
         #region Core Logic & Helper Methods
-        private async Task StartDownloadProcessAsync(List<string> workshopUrls)
+        private async Task StartDownloadProcessAsync(List<string> initialItems)
         {
-            if (!workshopUrls.Any()) { return; }
-            bool isSteamCmdReady = await CheckAndInstallSteamCmdAsync();
-            if (!isSteamCmdReady) { MessageBox.Show("Could not prepare SteamCMD.", "Error"); return; }
+            // This is now our master list of every individual item to download.
+            var finalDownloadList = new List<string>();
+            Log("Building final download list by expanding collections...");
+
             SetControlsEnabled(false);
+
+            // Go through the initial list from the ListView
+            foreach (string urlOrId in initialItems)
+            {
+                // First, we need to figure out if this item is a collection by checking its Tag in the main ListView
+                var listViewItem = lvWorkshopItems.Items.Cast<ListViewItem>()
+                    .FirstOrDefault(item => item.SubItems[2].Text == urlOrId);
+
+                if (listViewItem != null && listViewItem.Tag as string == "Collection")
+                {
+                    // If it's a collection, expand it and add its contents to our final list
+                    List<string> itemsFromCollection = await GetItemUrlsFromCollectionAsync(urlOrId);
+                    if (itemsFromCollection != null)
+                    {
+                        finalDownloadList.AddRange(itemsFromCollection);
+                    }
+                }
+                else
+                {
+                    // If it's just a single item, add it directly.
+                    finalDownloadList.Add(urlOrId);
+                }
+            }
+
+            Log($"Final download queue contains {finalDownloadList.Count} total items.");
+
+            if (!finalDownloadList.Any())
+            {
+                Log("No items to download.");
+                SetControlsEnabled(true);
+                return;
+            }
+
+            bool isSteamCmdReady = await CheckAndInstallSteamCmdAsync();
+            if (!isSteamCmdReady) { MessageBox.Show("Could not prepare SteamCMD.", "Error"); SetControlsEnabled(true); return; }
+
             progressBar.Value = 0;
-            progressBar.Maximum = workshopUrls.Count;
+            progressBar.Maximum = finalDownloadList.Count;
+
+            // The progress reporter needs to be updated to handle this new logic
             var progress = new Progress<(string itemId, string status)>(update =>
             {
-                var itemToUpdate = lvWorkshopItems.Items.Cast<ListViewItem>().FirstOrDefault(item => ParseWorkshopIds(new[] { item.SubItems[2].Text }).FirstOrDefault() == update.itemId);
-                if (itemToUpdate != null)
+                // Find the original item (it could be a collection or a single item)
+                var originalItem = lvWorkshopItems.Items.Cast<ListViewItem>()
+                    .FirstOrDefault(item => ParseWorkshopIds(new[] { item.SubItems[2].Text }).Contains(update.itemId));
+
+                if (originalItem != null)
                 {
-                    itemToUpdate.SubItems[1].Text = update.status;
-                    if (update.status == "Success") { itemToUpdate.SubItems[1].ForeColor = ColorTranslator.FromHtml("#A1CD44"); }
-                    else if (update.status == "Failed") { itemToUpdate.SubItems[1].ForeColor = ColorTranslator.FromHtml("#D23B2A"); }
-                    else { itemToUpdate.SubItems[1].ForeColor = this.ForeColor; }
+                    // If it's a collection, we can show sub-progress
+                    if (originalItem.Tag as string == "Collection")
+                    {
+                        int current = progressBar.Value + 1;
+                        originalItem.SubItems[1].Text = $"Downloading ({current}/{finalDownloadList.Count})";
+                    }
+                    else
+                    {
+                        originalItem.SubItems[1].Text = update.status;
+                    }
                 }
-                if (update.status == "Success" || update.status == "Failed") { if (progressBar.Value < progressBar.Maximum) { progressBar.Value++; } }
+
+                if (update.status == "Success" || update.status == "Failed")
+                {
+                    if (progressBar.Value < progressBar.Maximum) { progressBar.Value++; }
+                }
             });
-            try { await Task.Run(() => RunSteamCmd(txtAppId.Text, workshopUrls, progress)); }
-            finally { progressBar.Value = progressBar.Maximum; SetControlsEnabled(true); }
+
+            try
+            {
+                await Task.Run(() => RunSteamCmd(txtAppId.Text, finalDownloadList, progress));
+            }
+            finally
+            {
+                progressBar.Value = progressBar.Maximum;
+                SetControlsEnabled(true);
+            }
         }
 
         private void RunSteamCmd(string appId, List<string> workshopUrls, IProgress<(string itemId, string status)> progress)
@@ -230,37 +334,9 @@ namespace SteamCMDDL
             }
         }
 
-        private async Task AddSingleItemToListAsync(string itemUrlOrId)
-        {
-            ListViewItem newItem = new ListViewItem("Fetching name...");
-            newItem.SubItems.Add("Pending");
-            newItem.SubItems.Add(itemUrlOrId);
-            lvWorkshopItems.Items.Add(newItem);
-            string modName = await Task.Run(() => FetchModNameFromUrlAsync(itemUrlOrId));
-            newItem.Text = modName;
-        }
+        
 
-        private async Task AddItemsFromCollectionUrlAsync(string url)
-        {
-            SetControlsEnabled(false);
-            try
-            {
-                var html = await client.GetStringAsync(url);
-                var htmlDoc = new HtmlAgilityPack.HtmlDocument();
-                htmlDoc.LoadHtml(html);
-                var itemNodes = htmlDoc.DocumentNode.SelectNodes("//div[contains(@class, 'collectionItemDetails')]");
-                if (itemNodes == null || itemNodes.Count == 0) { await AddSingleItemToListAsync(url); }
-                else
-                {
-                    foreach (var node in itemNodes)
-                    {
-                        var linkNode = node.SelectSingleNode(".//a");
-                        if (linkNode != null) { _ = AddSingleItemToListAsync(linkNode.GetAttributeValue("href", string.Empty)); }
-                    }
-                }
-            }
-            finally { SetControlsEnabled(true); }
-        }
+        
 
         private async Task<string> FetchModNameFromUrlAsync(string url)
         {
@@ -438,9 +514,47 @@ namespace SteamCMDDL
             }
         }
 
-        private void picModPreview_Click(object sender, EventArgs e)
+        private async Task AddItemToListAsync(string url)
         {
+            // Add a placeholder to the list immediately for responsiveness
+            ListViewItem newItem = new ListViewItem("Checking URL...");
+            newItem.SubItems.Add("Pending");
+            newItem.SubItems.Add(url);
+            lvWorkshopItems.Items.Add(newItem);
 
+            try
+            {
+                var html = await client.GetStringAsync(url);
+                var htmlDoc = new HtmlAgilityPack.HtmlDocument();
+                htmlDoc.LoadHtml(html);
+
+                // Check for the element that ONLY exists on collection pages
+                var collectionNode = htmlDoc.DocumentNode.SelectSingleNode("//div[@class='collectionChildren']");
+
+                string itemName;
+                if (collectionNode != null)
+                {
+                    // It's a collection!
+                    itemName = htmlDoc.DocumentNode.SelectSingleNode("//div[@class='workshopItemTitle']")?.InnerText.Trim() ?? "Unknown Collection";
+                    newItem.Text = $"{itemName} [Collection]";
+                    newItem.Tag = "Collection"; // We use the 'Tag' property to remember what this is.
+                }
+                else
+                {
+                    // It's a single item
+                    itemName = htmlDoc.DocumentNode.SelectSingleNode("//div[@class='workshopItemTitle']")?.InnerText.Trim() ?? "Unknown Item";
+                    newItem.Text = itemName;
+                    newItem.Tag = "SingleItem"; // We tag this as a single item.
+                }
+
+                Log($"Added '{newItem.Text}' to the list.");
+            }
+            catch (Exception ex)
+            {
+                newItem.Text = "Failed to add item";
+                newItem.SubItems[1].Text = "Error";
+                Log($"Failed to process URL {url}: {ex.Message}");
+            }
         }
     }
     #endregion
